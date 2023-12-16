@@ -1,91 +1,50 @@
 pipeline 'LFCICDTest', {
-  description = ''
-  disableMultipleActiveRuns = '0'
-  disableRestart = '0'
-  enabled = '1'
-  overrideWorkspace = '0'
-  pipelineRunNameTemplate = null
   projectName = 'jai'
-  releaseName = null
-  skipStageMode = 'ENABLED'
-  templatePipelineName = null
-  templatePipelineProjectName = null
-  type = null
-  workspaceName = null
 
   formalParameter 'releaseVersion', defaultValue: '', {
-    expansionDeferred = '0'
     label = 'Release Version'
     orderIndex = '1'
-    required = '0'
     type = 'entry'
   }
 
   formalParameter 'componentDeployment', defaultValue: 'false', {
     checkedValue = 'true'
-    expansionDeferred = '0'
     label = 'Component Deployment'
     orderIndex = '2'
-    required = '0'
     type = 'checkbox'
     uncheckedValue = 'false'
   }
 
   formalParameter 'kubernetesDeployment', defaultValue: 'false', {
     checkedValue = 'true'
-    expansionDeferred = '0'
     label = 'Kubernetes Deployment'
     orderIndex = '3'
-    required = '0'
     type = 'checkbox'
     uncheckedValue = 'false'
   }
 
   formalParameter 'deployInGCP', defaultValue: 'false', {
     checkedValue = 'true'
-    expansionDeferred = '0'
     label = 'Deploy in GCP'
     orderIndex = '4'
-    required = '0'
     type = 'checkbox'
     uncheckedValue = 'false'
   }
 
-  formalParameter 'ec_stagesToRun', defaultValue: null, {
+  formalParameter 'ec_stagesToRun', {
     expansionDeferred = '1'
-    label = null
-    orderIndex = null
-    required = '0'
-    type = null
   }
 
   stage 'Build', {
-    description = ''
     colorCode = '#289ce1'
-    completionType = 'auto'
-    condition = null
-    duration = null
-    parallelToPrevious = null
     pipelineName = 'LFCICDTest'
-    plannedEndDate = null
-    plannedStartDate = null
-    precondition = null
-    resourceName = null
-    waitForPlannedStartDate = '0'
-
     gate 'PRE', {
-      condition = null
-      precondition = null
       }
 
     gate 'POST', {
-      condition = null
-      precondition = null
       }
 
     task 'Create Branch', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': '''#echo "====>$[/projects[jai]/credentials[GitlabAccessToken]]/password"
 #!/bin/bash
@@ -97,163 +56,24 @@ else
     echo "Branch already exists"
 fi''',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'CI Build', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'releaseVersion': '$[releaseVersion]',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
       ciConfigurationName = 'jenkins75'
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
       ciJobFolder = 'Jai/'
       ciJobName = 'CICDTestService'
       condition = '$[/javascript myPipelineRuntime.componentDeployment] || $[/javascript myPipelineRuntime.deployInGCP]'
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
-      subpluginKey = null
-      subprocedure = null
-      subprocess = null
       subproject = 'jai'
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'CI_JOB'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Download Build Artifact', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'artifacts': 'Build.txt',
         'build_number': '',
@@ -261,83 +81,13 @@ fi''',
         'job_name': 'CICDTestService',
         'target_directory': '',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
       condition = '$[/javascript myPipelineRuntime.componentDeployment] || $[/javascript myPipelineRuntime.deployInGCP]'
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Jenkins'
       subprocedure = 'DownloadArtifacts'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Read Build Artifact', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': '''use ElectricCommander;
 use Path::Tiny;
@@ -356,188 +106,36 @@ my $file_contents = path($buildData)->slurp;
 $ec->setProperty("/myPipelineRuntime/buildData", $file_contents);''',
         'shellToUse': 'cb-perl',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
       condition = '$[/javascript myPipelineRuntime.componentDeployment] || $[/javascript myPipelineRuntime.deployInGCP]'
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'CI Build with docker', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'releaseVersion': '$[releaseVersion]',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
       ciConfigurationName = 'jenkins75'
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
       ciJobFolder = 'Jai/'
       ciJobName = 'CICDTestKubernetes'
       condition = '$[/javascript myPipelineRuntime.kubernetesDeployment]'
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
-      subpluginKey = null
-      subprocedure = null
-      subprocess = null
       subproject = 'jai'
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'CI_JOB'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
   }
 
   stage 'Pre Prod', {
-    description = ''
     colorCode = '#ff7f0e'
-    completionType = 'auto'
     condition = '$[/javascript myPipelineRuntime.componentDeployment]'
-    duration = null
-    parallelToPrevious = null
     pipelineName = 'LFCICDTest'
-    plannedEndDate = null
-    plannedStartDate = null
-    precondition = null
-    resourceName = null
-    waitForPlannedStartDate = '0'
-
     gate 'PRE', {
-      condition = null
-      precondition = null
       }
 
     gate 'POST', {
-      condition = null
-      precondition = null
       }
 
     task 'Call App Comp', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'artifactBuildInfo': '$[/myPipelineRuntime/buildData]',
         'ec_enforceDependencies': '1',
@@ -545,83 +143,17 @@ $ec->setProperty("/myPipelineRuntime/buildData", $file_contents);''',
         'ec_stageArtifacts': '1',
         'releaseVersion': '$[releaseVersion]',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
       environmentName = 'CICDTestServicePreProd'
       environmentProjectName = 'jai'
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
       rollingDeployEnabled = '0'
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
       subapplication = 'jai'
-      subpipeline = null
-      subpluginKey = null
-      subprocedure = null
       subprocess = 'Deploy'
       subproject = 'jai'
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
       taskProcessType = 'APPLICATION'
       taskType = 'PROCESS'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Quality Gate', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': '''import groovy.json.JsonSlurper
 import com.electriccloud.client.groovy.ElectricFlow
@@ -730,108 +262,25 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
 ''',
         'shellToUse': 'ec-groovy',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
   }
 
   stage 'Kubernetes Deploy', {
-    description = ''
     colorCode = '#2ca02c'
-    completionType = 'auto'
     condition = '$[/javascript myPipelineRuntime.kubernetesDeployment]'
-    duration = null
-    parallelToPrevious = null
     pipelineName = 'LFCICDTest'
-    plannedEndDate = null
-    plannedStartDate = null
-    precondition = null
     resourceName = ''
-    waitForPlannedStartDate = '0'
 
     gate 'PRE', {
-      condition = null
-      precondition = null
       }
 
     gate 'POST', {
-      condition = null
-      precondition = null
       }
 
     task 'Get Deployment and Service File', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'artifacts': '*.yaml',
         'build_number': '',
@@ -839,83 +288,13 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
         'job_name': 'CICDTestKubernetes',
         'target_directory': '',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'cheetah'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Jenkins'
       subprocedure = 'DownloadArtifacts'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Apply Deployment Obj', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'additionalOptionsForKubectl': '',
         'additionalOptionsForKubectlCommand': '',
@@ -926,83 +305,13 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
         'specSource': 'filePath',
         'updateAction': 'apply',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'cheetah'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Kubectl'
       subprocedure = 'Create Or Update Objects'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Apply Service Obj', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'additionalOptionsForKubectl': '',
         'additionalOptionsForKubectlCommand': '',
@@ -1013,83 +322,13 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
         'specSource': 'filePath',
         'updateAction': 'apply',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'cheetah'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Kubectl'
       subprocedure = 'Create Or Update Objects'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'CMD', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': '''kubectl get deployments
 echo "================"
@@ -1099,108 +338,26 @@ kubectl get service
 echo "================"
 kubectl get nodes -o wide''',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'cheetah'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
   }
 
   stage 'GCP ENV', {
-    description = ''
     colorCode = '#ff7f0e'
-    completionType = 'auto'
     condition = '$[/javascript myPipelineRuntime.deployInGCP]'
-    duration = null
-    parallelToPrevious = null
     pipelineName = 'LFCICDTest'
-    plannedEndDate = null
-    plannedStartDate = null
-    precondition = null
     resourceName = 'GCPTest'
-    waitForPlannedStartDate = '0'
 
     gate 'PRE', {
-      condition = null
-      precondition = null
       }
 
     gate 'POST', {
-      condition = null
-      precondition = null
       }
 
     task 'Call App Comp', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'artifactBuildInfo': '$[/myPipelineRuntime/buildData]',
         'ec_enforceDependencies': '1',
@@ -1208,83 +365,17 @@ kubectl get nodes -o wide''',
         'ec_stageArtifacts': '1',
         'releaseVersion': '$[releaseVersion]',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
       environmentName = 'GCPEnv'
       environmentProjectName = 'jai'
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
       rollingDeployEnabled = '0'
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
       subapplication = 'jai'
-      subpipeline = null
-      subpluginKey = null
-      subprocedure = null
       subprocess = 'Deploy'
       subproject = 'jai'
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
       taskProcessType = 'APPLICATION'
       taskType = 'PROCESS'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Quality Gate', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': '''import groovy.json.JsonSlurper
 import com.electriccloud.client.groovy.ElectricFlow
@@ -1393,431 +484,65 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
 ''',
         'shellToUse': 'ec-groovy',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
-      resourceName = ''
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
   }
 
   stage 'Deploy via Terraform', {
-    description = ''
     colorCode = '#d62728'
-    completionType = 'auto'
-    condition = null
-    duration = null
-    parallelToPrevious = null
     pipelineName = 'LFCICDTest'
-    plannedEndDate = null
-    plannedStartDate = null
-    precondition = null
-    resourceName = null
-    waitForPlannedStartDate = '0'
-
     gate 'PRE', {
-      condition = null
-      precondition = null
       }
 
     gate 'POST', {
-      condition = null
-      precondition = null
       }
 
     task 'CMD', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': 'rm -f /home/logicfocus/terraform/main.tf /home/logicfocus/terraform/plan /home/logicfocus/terraform/terraform.tfstate /home/logicfocus/terraform/terraform.tfstate.backup /home/logicfocus/terraform/terraform_1.0.7_linux_amd64.zip /home/logicfocus/terraform/terraform_1.6.5_linux_amd64.zip /home/logicfocus/terraform/startUp.sh.save',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Permission', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'commandToRun': 'echo "lf@2022" | sudo -S chmod 777 -R /home/logicfocus/terraform',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'COMMAND'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Check', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'Filter': '',
         'Separator': '',
         'TargetDir': '/home/logicfocus/terraform',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-FileOps'
       subprocedure = 'ListFiles'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'File', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'Mode': '0777',
         'Name': '/home/logicfocus/terraform/main.tf',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-FileOps'
       subprocedure = 'CreateEmptyFile'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Add content', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'AddNewLine': '1',
         'Append': '0',
@@ -1909,331 +634,51 @@ output "ip" {
 }''',
         'Path': '/home/logicfocus/terraform/main.tf',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-FileOps'
       subprocedure = 'AddTextToFile'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Init working Dir', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
         'tfCommandArguments': '''-var \'project_id=lftest-407308\'
 -var \'gcp-creds=/home/logicfocus/terraform/gcpcred.json\'''',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Terraform'
       subprocedure = 'Init'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Plan', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
         'tfCommandArguments': '''-var \'project_id=lftest-407308\'
 -var \'gcp-creds=/home/logicfocus/terraform/gcpcred.json\'''',
         'tfPlanName': 'plan',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Terraform'
       subprocedure = 'Plan'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Create VM', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
         'tfCommandArguments': '',
         'tfOutputProperty': '/myJob/showResults',
         'tfPlanName': 'plan',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
-      enabled = '1'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Terraform'
       subprocedure = 'Apply'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
 
     task 'Provisinor', {
-      description = ''
-      actionLabelText = null
       actualParameter = [
         'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
         'tfConfigContent': '''
@@ -2272,78 +717,11 @@ output "ip" {
         'tfConfigLocation': '',
         'tfOutputProperty': '/myJob/showResults',
       ]
-      advancedMode = '0'
-      afterLastRetry = null
-      allowOutOfOrderRun = '0'
-      allowSkip = null
-      alwaysRun = '0'
-      applicationName = null
-      applicationProjectName = null
-      applicationVersion = null
-      artifacts = null
-      artifactsRegEx = null
-      ciConfigurationName = null
-      ciControllerFolder = null
-      ciControllerName = null
-      ciEndpoint = null
-      ciJobBranchName = null
-      ciJobFolder = null
-      ciJobName = null
-      condition = null
-      customLabel = null
-      deployerExpression = null
-      deployerRunType = null
-      disableFailure = null
-      duration = null
-      emailConfigName = null
       enabled = '0'
-      environmentName = null
-      environmentProjectName = null
-      environmentTemplateName = null
-      environmentTemplateProjectName = null
-      errorHandling = 'stopOnError'
-      gateCondition = null
-      gateType = null
-      groupName = null
-      groupRunType = null
-      insertRollingDeployManualStep = '0'
-      instruction = null
-      notificationEnabled = null
-      notificationTemplate = null
-      parallelToPrevious = null
-      plannedEndDate = null
-      plannedStartDate = null
-      precondition = null
-      requiredApprovalsCount = null
       resourceName = 'LFServer75'
-      retryCount = null
-      retryInterval = null
-      retryType = null
-      rollingDeployEnabled = null
-      rollingDeployManualStepCondition = null
-      skippable = '0'
-      snapshotName = null
-      stageSummaryParameters = null
-      startingStage = null
-      subErrorHandling = null
-      subTaskType = null
-      subapplication = null
-      subpipeline = null
       subpluginKey = 'EC-Terraform'
       subprocedure = 'Provision'
-      subprocess = null
-      subproject = null
-      subrelease = null
-      subreleasePipeline = null
-      subreleasePipelineProject = null
-      subreleaseSuffix = null
-      subworkflowDefinition = null
-      subworkflowStartingState = null
-      taskProcessType = null
       taskType = 'PLUGIN'
-      triggerType = null
-      useApproverAcl = '0'
-      waitForPlannedStartDate = '0'
     }
   }
 
@@ -2367,79 +745,52 @@ output "ip" {
 
         // Custom properties
 
-        property 'checkedValue', value: 'true', {
-          expandable = '1'
-          suppressValueTracking = '0'
-        }
+        property 'checkedValue', value: 'true'
         formType = 'standard'
 
-        property 'uncheckedValue', value: 'false', {
-          expandable = '1'
-          suppressValueTracking = '0'
-        }
+        property 'uncheckedValue', value: 'false'
       }
 
       property 'deployInGCP', {
 
         // Custom properties
 
-        property 'checkedValue', value: 'true', {
-          expandable = '1'
-          suppressValueTracking = '0'
-        }
+        property 'checkedValue', value: 'true'
         formType = 'standard'
 
-        property 'uncheckedValue', value: 'false', {
-          expandable = '1'
-          suppressValueTracking = '0'
-        }
+        property 'uncheckedValue', value: 'false'
       }
 
       property 'kubernetesDeployment', {
 
         // Custom properties
 
-        property 'checkedValue', value: 'true', {
-          expandable = '1'
-          suppressValueTracking = '0'
-        }
+        property 'checkedValue', value: 'true'
         formType = 'standard'
 
-        property 'uncheckedValue', value: 'false', {
-          expandable = '1'
-          suppressValueTracking = '0'
-        }
+        property 'uncheckedValue', value: 'false'
       }
     }
   }
 
   property 'CICDTestServiceId', value: '42296142', {
-    description = ''
-    expandable = '1'
     suppressValueTracking = '1'
   }
 
   property 'GCPProjectId', value: 'lftest-407308', {
-    description = ''
-    expandable = '1'
     suppressValueTracking = '1'
   }
 
   property 'artifactBuildPath', value: '/home/logicfocus/jai/Build.txt', {
-    description = ''
-    expandable = '1'
     suppressValueTracking = '1'
   }
 
   property 'gitLabAccessToken', value: 'glpat-_8xMsbHDzintdaxYMk-k', {
-    description = ''
-    expandable = '1'
     suppressValueTracking = '1'
   }
 
   property 'referenceBranch', value: 'develop', {
     description = 'Reference branch from which a release branch will be created'
-    expandable = '1'
     suppressValueTracking = '1'
   }
 }
