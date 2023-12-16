@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '${facimateDefacultBranch}']], extensions: [], userRemoteConfigs: [[credentialsId: 'jaiGitlab', url: 'https://gitlab.com/logicfocus.in/facimate.git']])
+            }
+        }
+        stage('Build') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                sh 'chmod -R 755 .'
+                sh './gradlew clean -Pversion=${facimateVersion} build'
+            }
+        }
+        stage ('Scan') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                withSonarQubeEnv(installationName: 'Sonar_12', credentialsId: 'sonar') {
+                sh "./gradlew sonarqube \
+                  -Dsonar.projectKey=${facimateSonar} \
+                  -Dsonar.projectName=${facimateSonar} \
+                  -Dsonar.projectVersion=${facimateVersion}"
+                }
+             }
+        }
+        stage ('Upload Artifact') {
+            steps {
+                nexusArtifactUploader(
+                nexusVersion: "${nexusVersion}",
+                protocol: 'http',
+                nexusUrl: "${nexusURL}",
+                groupId: "${nexusFacimateGroupId}",
+                version: "${facimateVersion}",
+                repository: "${nexusFacimateRepo}",
+                credentialsId: 'nexus1',
+                artifacts: [
+                    [artifactId: "${nexusFacimateArtifact}",
+                     classifier: '',
+                     file: 'build/libs/facimate-services-${facimateVersion}' + '.jar',
+                     type: 'jar']
+                ])
+            }
+        }
+        stage("Trigger CloudBees CD/RO") {
+            steps{
+               cloudBeesFlowRunPipeline addParam: '{"pipeline":{"pipelineName":"${cloudbeesFacimatePipeline}","parameters":"[{\\"parameterName\\": \\"nexusFacimateRepo\\", \\"parameterValue\\": \\"${nexusFacimateRepo}\\"}, {\\"parameterName\\": \\"nexusFacimateGroupId\\", \\"parameterValue\\": \\"${nexusFacimateGroupId}\\"}, {\\"parameterName\\": \\"nexusFacimateArtifact\\", \\"parameterValue\\": \\"${nexusFacimateArtifact}\\"}, {\\"parameterName\\": \\"facimateVersion\\", \\"parameterValue\\": \\"${facimateVersion}\\"}]"}}', configuration: '/project/Default/pluginConfiguration/jenkins', pipelineName: "${cloudbeesFacimatePipeline}", projectName: "${cloudbeesFacimateProject}"
+            }
+        }
+    }
+   
+}
