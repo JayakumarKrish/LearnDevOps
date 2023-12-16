@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+    environment {
+        NEXUS_CREDS = credentials('nexus1')
+        DOCKER_HUB_REPO = 'jayakumarkrishnan/facimate'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '${facimateDefacultBranch}']], extensions: [], userRemoteConfigs: [[credentialsId: 'jaiGitlab', url: 'https://gitlab.com/logicfocus.in/facimate.git']])
+            }
+        }
+        stage('Build') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                sh 'chmod -R 755 .'
+                sh './gradlew clean -Pversion=${facimateVersion} build'
+            }
+        }
+        stage('Build Docker') {
+            steps {
+                sh 'docker build -t $DOCKER_HUB_REPO:${facimateVersion} .'
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'jaiDockerSecret', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    }
+                }
+            }
+        }
+        stage('Push to DockerHub') {
+            steps {
+                sh 'docker push $DOCKER_HUB_REPO:${facimateVersion}'
+            }
+        }
+        stage("Trigger CloudBees CD/RO") {
+            steps{
+               cloudBeesFlowRunPipeline addParam: '{"pipeline":{"pipelineName":"FacimateDockerHubCICD","parameters":"[{\\"parameterName\\": \\"facimateVersion\\", \\"parameterValue\\": \\"${facimateVersion}\\"}]"}}', configuration: '/project/Default/pluginConfiguration/jenkins', pipelineName: 'FacimateDockerHubCICD', projectName: 'jai', stageOption: 'runAllStages', stagesToRun: '{"pipeline":{"pipelineName":"FacimateDockerHubCICD","stages":[{"stageName":"Stage 1","stageValue":""}]}}', startingStage: ''
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
+        }
+    }
+   
+}
