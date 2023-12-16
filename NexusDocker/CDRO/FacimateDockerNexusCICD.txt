@@ -1,0 +1,472 @@
+pipeline 'FacimateDockerNexusCICD', {
+  description = ''
+  disableMultipleActiveRuns = '0'
+  disableRestart = '0'
+  enabled = '1'
+  overrideWorkspace = '0'
+  pipelineRunNameTemplate = null
+  projectName = 'jai'
+  releaseName = null
+  skipStageMode = 'ENABLED'
+  templatePipelineName = null
+  templatePipelineProjectName = null
+  type = null
+  workspaceName = null
+
+  formalParameter 'facimateVersion', defaultValue: '', {
+    expansionDeferred = '0'
+    label = 'Facimate version'
+    orderIndex = '1'
+    required = '1'
+    type = 'entry'
+  }
+
+  formalParameter 'ec_stagesToRun', defaultValue: null, {
+    expansionDeferred = '1'
+    label = null
+    orderIndex = null
+    required = '0'
+    type = null
+  }
+
+  stage 'Docker Login', {
+    description = ''
+    colorCode = '#ff7f0e'
+    completionType = 'auto'
+    condition = null
+    duration = null
+    parallelToPrevious = null
+    pipelineName = 'FacimateDockerNexusCICD'
+    plannedEndDate = null
+    plannedStartDate = null
+    precondition = null
+    resourceName = null
+    waitForPlannedStartDate = '0'
+
+    gate 'PRE', {
+      condition = null
+      precondition = null
+      }
+
+    gate 'POST', {
+      condition = null
+      precondition = null
+      }
+
+    task 'Login Docker_Nexus Repo', {
+      description = ''
+      actionLabelText = null
+      actualParameter = [
+        'commandToRun': 'echo $[/myPipeline/secrect] | docker login http://192.168.1.30:8082 -u $[/myPipeline/user] --password-stdin ',
+      ]
+      advancedMode = '0'
+      afterLastRetry = null
+      allowOutOfOrderRun = '0'
+      allowSkip = null
+      alwaysRun = '0'
+      applicationName = null
+      applicationProjectName = null
+      applicationVersion = null
+      artifacts = null
+      artifactsRegEx = null
+      ciConfigurationName = null
+      ciControllerFolder = null
+      ciControllerName = null
+      ciEndpoint = null
+      ciJobBranchName = null
+      ciJobFolder = null
+      ciJobName = null
+      condition = null
+      customLabel = null
+      deployerExpression = null
+      deployerRunType = null
+      disableFailure = null
+      duration = null
+      emailConfigName = null
+      enabled = '1'
+      environmentName = null
+      environmentProjectName = null
+      environmentTemplateName = null
+      environmentTemplateProjectName = null
+      errorHandling = 'stopOnError'
+      gateCondition = null
+      gateType = null
+      groupName = null
+      groupRunType = null
+      insertRollingDeployManualStep = '0'
+      instruction = null
+      notificationEnabled = null
+      notificationTemplate = null
+      parallelToPrevious = null
+      plannedEndDate = null
+      plannedStartDate = null
+      precondition = null
+      requiredApprovalsCount = null
+      resourceName = ''
+      retryCount = null
+      retryInterval = null
+      retryType = null
+      rollingDeployEnabled = null
+      rollingDeployManualStepCondition = null
+      skippable = '0'
+      snapshotName = null
+      stageSummaryParameters = null
+      startingStage = null
+      subErrorHandling = null
+      subTaskType = null
+      subapplication = null
+      subpipeline = null
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      subprocess = null
+      subproject = null
+      subrelease = null
+      subreleasePipeline = null
+      subreleasePipelineProject = null
+      subreleaseSuffix = null
+      subworkflowDefinition = null
+      subworkflowStartingState = null
+      taskProcessType = null
+      taskType = 'COMMAND'
+      triggerType = null
+      useApproverAcl = '0'
+      waitForPlannedStartDate = '0'
+    }
+  }
+
+  stage 'Pull Image From Nexus', {
+    description = ''
+    colorCode = '#289ce1'
+    completionType = 'auto'
+    condition = null
+    duration = null
+    parallelToPrevious = null
+    pipelineName = 'FacimateDockerNexusCICD'
+    plannedEndDate = null
+    plannedStartDate = null
+    precondition = null
+    resourceName = null
+    waitForPlannedStartDate = '0'
+
+    gate 'PRE', {
+      condition = null
+      precondition = null
+      }
+
+    gate 'POST', {
+      condition = null
+      precondition = null
+      }
+
+    task 'Pull image', {
+      description = ''
+      actionLabelText = null
+      actualParameter = [
+        'commandToRun': 'docker pull 192.168.1.30:8082/facimate-services:34',
+      ]
+      advancedMode = '0'
+      afterLastRetry = null
+      allowOutOfOrderRun = '0'
+      allowSkip = null
+      alwaysRun = '0'
+      applicationName = null
+      applicationProjectName = null
+      applicationVersion = null
+      artifacts = null
+      artifactsRegEx = null
+      ciConfigurationName = null
+      ciControllerFolder = null
+      ciControllerName = null
+      ciEndpoint = null
+      ciJobBranchName = null
+      ciJobFolder = null
+      ciJobName = null
+      condition = null
+      customLabel = null
+      deployerExpression = null
+      deployerRunType = null
+      disableFailure = null
+      duration = null
+      emailConfigName = null
+      enabled = '1'
+      environmentName = null
+      environmentProjectName = null
+      environmentTemplateName = null
+      environmentTemplateProjectName = null
+      errorHandling = 'stopOnError'
+      gateCondition = null
+      gateType = null
+      groupName = null
+      groupRunType = null
+      insertRollingDeployManualStep = '0'
+      instruction = null
+      notificationEnabled = null
+      notificationTemplate = null
+      parallelToPrevious = null
+      plannedEndDate = null
+      plannedStartDate = null
+      precondition = null
+      requiredApprovalsCount = null
+      resourceName = ''
+      retryCount = null
+      retryInterval = null
+      retryType = null
+      rollingDeployEnabled = null
+      rollingDeployManualStepCondition = null
+      skippable = '0'
+      snapshotName = null
+      stageSummaryParameters = null
+      startingStage = null
+      subErrorHandling = null
+      subTaskType = null
+      subapplication = null
+      subpipeline = null
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      subprocess = null
+      subproject = null
+      subrelease = null
+      subreleasePipeline = null
+      subreleasePipelineProject = null
+      subreleaseSuffix = null
+      subworkflowDefinition = null
+      subworkflowStartingState = null
+      taskProcessType = null
+      taskType = 'COMMAND'
+      triggerType = null
+      useApproverAcl = '0'
+      waitForPlannedStartDate = '0'
+    }
+  }
+
+  stage 'Run Image', {
+    description = ''
+    colorCode = '#d62728'
+    completionType = 'auto'
+    condition = null
+    duration = null
+    parallelToPrevious = null
+    pipelineName = 'FacimateDockerNexusCICD'
+    plannedEndDate = null
+    plannedStartDate = null
+    precondition = null
+    resourceName = null
+    waitForPlannedStartDate = '0'
+
+    gate 'PRE', {
+      condition = null
+      precondition = null
+      }
+
+    gate 'POST', {
+      condition = null
+      precondition = null
+      }
+
+    task 'Run image', {
+      description = ''
+      actionLabelText = null
+      actualParameter = [
+        'commandToRun': 'docker run -d -p 9090:9090 192.168.1.30:8082/facimate-services:$[facimateVersion]',
+      ]
+      advancedMode = '0'
+      afterLastRetry = null
+      allowOutOfOrderRun = '0'
+      allowSkip = null
+      alwaysRun = '0'
+      applicationName = null
+      applicationProjectName = null
+      applicationVersion = null
+      artifacts = null
+      artifactsRegEx = null
+      ciConfigurationName = null
+      ciControllerFolder = null
+      ciControllerName = null
+      ciEndpoint = null
+      ciJobBranchName = null
+      ciJobFolder = null
+      ciJobName = null
+      condition = null
+      customLabel = null
+      deployerExpression = null
+      deployerRunType = null
+      disableFailure = null
+      duration = null
+      emailConfigName = null
+      enabled = '1'
+      environmentName = null
+      environmentProjectName = null
+      environmentTemplateName = null
+      environmentTemplateProjectName = null
+      errorHandling = 'stopOnError'
+      gateCondition = null
+      gateType = null
+      groupName = null
+      groupRunType = null
+      insertRollingDeployManualStep = '0'
+      instruction = null
+      notificationEnabled = null
+      notificationTemplate = null
+      parallelToPrevious = null
+      plannedEndDate = null
+      plannedStartDate = null
+      precondition = null
+      requiredApprovalsCount = null
+      resourceName = ''
+      retryCount = null
+      retryInterval = null
+      retryType = null
+      rollingDeployEnabled = null
+      rollingDeployManualStepCondition = null
+      skippable = '0'
+      snapshotName = null
+      stageSummaryParameters = null
+      startingStage = null
+      subErrorHandling = null
+      subTaskType = null
+      subapplication = null
+      subpipeline = null
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      subprocess = null
+      subproject = null
+      subrelease = null
+      subreleasePipeline = null
+      subreleasePipelineProject = null
+      subreleaseSuffix = null
+      subworkflowDefinition = null
+      subworkflowStartingState = null
+      taskProcessType = null
+      taskType = 'COMMAND'
+      triggerType = null
+      useApproverAcl = '0'
+      waitForPlannedStartDate = '0'
+    }
+  }
+
+  stage 'Docker Logout', {
+    description = ''
+    colorCode = '#2ca02c'
+    completionType = 'auto'
+    condition = null
+    duration = null
+    parallelToPrevious = null
+    pipelineName = 'FacimateDockerNexusCICD'
+    plannedEndDate = null
+    plannedStartDate = null
+    precondition = null
+    resourceName = null
+    waitForPlannedStartDate = '0'
+
+    gate 'PRE', {
+      condition = null
+      precondition = null
+      }
+
+    gate 'POST', {
+      condition = null
+      precondition = null
+      }
+
+    task 'Logout', {
+      description = ''
+      actionLabelText = null
+      actualParameter = [
+        'commandToRun': '''docker images
+docker logout''',
+      ]
+      advancedMode = '0'
+      afterLastRetry = null
+      allowOutOfOrderRun = '0'
+      allowSkip = null
+      alwaysRun = '0'
+      applicationName = null
+      applicationProjectName = null
+      applicationVersion = null
+      artifacts = null
+      artifactsRegEx = null
+      ciConfigurationName = null
+      ciControllerFolder = null
+      ciControllerName = null
+      ciEndpoint = null
+      ciJobBranchName = null
+      ciJobFolder = null
+      ciJobName = null
+      condition = null
+      customLabel = null
+      deployerExpression = null
+      deployerRunType = null
+      disableFailure = null
+      duration = null
+      emailConfigName = null
+      enabled = '1'
+      environmentName = null
+      environmentProjectName = null
+      environmentTemplateName = null
+      environmentTemplateProjectName = null
+      errorHandling = 'stopOnError'
+      gateCondition = null
+      gateType = null
+      groupName = null
+      groupRunType = null
+      insertRollingDeployManualStep = '0'
+      instruction = null
+      notificationEnabled = null
+      notificationTemplate = null
+      parallelToPrevious = null
+      plannedEndDate = null
+      plannedStartDate = null
+      precondition = null
+      requiredApprovalsCount = null
+      resourceName = ''
+      retryCount = null
+      retryInterval = null
+      retryType = null
+      rollingDeployEnabled = null
+      rollingDeployManualStepCondition = null
+      skippable = '0'
+      snapshotName = null
+      stageSummaryParameters = null
+      startingStage = null
+      subErrorHandling = null
+      subTaskType = null
+      subapplication = null
+      subpipeline = null
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      subprocess = null
+      subproject = null
+      subrelease = null
+      subreleasePipeline = null
+      subreleasePipelineProject = null
+      subreleaseSuffix = null
+      subworkflowDefinition = null
+      subworkflowStartingState = null
+      taskProcessType = null
+      taskType = 'COMMAND'
+      triggerType = null
+      useApproverAcl = '0'
+      waitForPlannedStartDate = '0'
+    }
+  }
+
+  // Custom properties
+
+  property 'ec_counters', {
+
+    // Custom properties
+    pipelineCounter = '15'
+  }
+
+  property 'secrect', value: 'lfadmin', {
+    description = ''
+    expandable = '1'
+    suppressValueTracking = '1'
+  }
+
+  property 'user', value: 'admin', {
+    description = ''
+    expandable = '1'
+    suppressValueTracking = '1'
+  }
+}
