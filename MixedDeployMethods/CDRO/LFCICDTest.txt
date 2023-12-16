@@ -1468,7 +1468,7 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
     }
   }
 
-  stage 'GCP instance', {
+  stage 'Deploy via Terraform', {
     description = ''
     colorCode = '#d62728'
     completionType = 'auto'
