@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    environment {
+        NEXUS_CREDS = credentials('nexus1')
+        NEXUS_DOCKER_REPO = '192.168.1.30:8082'
+        GIT_BRANCH='develop'
+        DOCKER_HUB_REPO = 'jayakumarkrishnan/cicdtest'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '${releaseVersion}']], extensions: [], userRemoteConfigs: [[credentialsId: 'jaiGitlab', url: 'https://gitlab.com/jayakumar97/cicdtest.git']])
+            }
+        }
+        stage('Build') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                sh 'chmod -R 755 .'
+                sh './gradlew clean build'
+            }
+        }
+        stage('Build Docker') {
+            steps {
+                sh 'docker build -t $DOCKER_HUB_REPO:${releaseVersion} .'
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'jaiDockerSecret', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    }
+                }
+            }
+        }
+        stage('Push to DockerHub') {
+            steps {
+                sh 'docker push $DOCKER_HUB_REPO:${releaseVersion}'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
+        }
+        success { 
+            archiveArtifacts artifacts: 'k0s-deployment.yaml', onlyIfSuccessful: true
+            archiveArtifacts artifacts: 'k0s-service.yaml', onlyIfSuccessful: true
+        }
+    }
+   
+}
