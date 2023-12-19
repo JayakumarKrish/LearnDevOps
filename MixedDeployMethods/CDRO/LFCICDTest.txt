@@ -31,6 +31,14 @@ pipeline 'LFCICDTest', {
     uncheckedValue = 'false'
   }
 
+  formalParameter 'deployViaTerraform', defaultValue: 'false', {
+    checkedValue = 'true'
+    label = 'Deploy Via Terraform'
+    orderIndex = '5'
+    type = 'checkbox'
+    uncheckedValue = 'false'
+  }
+
   formalParameter 'ec_stagesToRun', {
     expansionDeferred = '1'
   }
@@ -492,6 +500,7 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
 
   stage 'Deploy via Terraform', {
     colorCode = '#d62728'
+    condition = '$[/javascript myPipelineRuntime.deployViaTerraform]'
     pipelineName = 'LFCICDTest'
     gate 'PRE', {
       }
@@ -499,152 +508,41 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
     gate 'POST', {
       }
 
-    task 'CMD', {
+    task 'Retrieve artifact', {
       actualParameter = [
-        'commandToRun': 'rm -f /home/logicfocus/terraform/main.tf /home/logicfocus/terraform/plan /home/logicfocus/terraform/terraform.tfstate /home/logicfocus/terraform/terraform.tfstate.backup /home/logicfocus/terraform/terraform_1.0.7_linux_amd64.zip /home/logicfocus/terraform/terraform_1.6.5_linux_amd64.zip /home/logicfocus/terraform/startUp.sh.save',
+        'artifactId': 'cicdtestservice',
+        'classifier': '',
+        'config': '/projects/Logicfocus/pluginConfigurations/Nexus-config',
+        'destination': '/home/logicfocus/terraform/cicdTestApp',
+        'extension': 'zip',
+        'groupId': 'com.logicfocus',
+        'latestVersion': '0',
+        'overwrite': '1',
+        'repository': 'CICDTestService',
+        'repoType': 'maven',
+        'resultPropertySheet': '',
+        'version': '$[releaseVersion]',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Nexus'
+      subprocedure = 'Retrieve Artifact from Nexus'
+      taskType = 'PLUGIN'
+    }
+
+    task 'Extract', {
+      actualParameter = [
+        'commandToRun': 'unzip /home/logicfocus/terraform/cicdTestApp/cicdtestservice-$[releaseVersion].zip -d /home/logicfocus/terraform/cicdTestApp',
       ]
       resourceName = 'LFServer75'
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
       taskType = 'COMMAND'
-    }
-
-    task 'Permission', {
-      actualParameter = [
-        'commandToRun': 'echo "lf@2022" | sudo -S chmod 777 -R /home/logicfocus/terraform',
-      ]
-      resourceName = 'LFServer75'
-      subpluginKey = 'EC-Core'
-      subprocedure = 'RunCommand'
-      taskType = 'COMMAND'
-    }
-
-    task 'Check', {
-      actualParameter = [
-        'Filter': '',
-        'Separator': '',
-        'TargetDir': '/home/logicfocus/terraform',
-      ]
-      resourceName = 'LFServer75'
-      subpluginKey = 'EC-FileOps'
-      subprocedure = 'ListFiles'
-      taskType = 'PLUGIN'
-    }
-
-    task 'File', {
-      actualParameter = [
-        'Mode': '0777',
-        'Name': '/home/logicfocus/terraform/main.tf',
-      ]
-      resourceName = 'LFServer75'
-      subpluginKey = 'EC-FileOps'
-      subprocedure = 'CreateEmptyFile'
-      taskType = 'PLUGIN'
-    }
-
-    task 'Add content', {
-      actualParameter = [
-        'AddNewLine': '1',
-        'Append': '0',
-        'Content': '''locals {
-  project_id = var.project_id
-  serverSecrect = "lf@2022"
-}
-variable "gcp-creds" {
-  default= ""
-}
-provider "google" {
-  project = local.project_id
-  credentials = file("${var.gcp-creds}")
-  region  = "us-east1"
-  zone    = "us-east1-b"
-}
-
-resource "google_compute_instance" "vm_instance" {
-  name         = "lf-instancetest"
-  machine_type = "e2-medium"
-
-  tags = ["cdropublicegr", "cdropublicing", "cloudbeescdro", "default-allow-https", "vmpub", "cicd-test-egress", "cicd-test-rule"]
-
-  boot_disk {
-    initialize_params {
-      image = "debian-11-bullseye-v20231115"
-    }
-  }
-  network_interface {
-    network = "default"
-    access_config {}
-  }
-
-  metadata = {
-    ssh-keys = "gce:${file("/home/logicfocus/.ssh/id_rsa.pub")}"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "wget -O - https://apt.corretto.aws/corretto.key | sudo gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg && echo \\"deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main\\" | sudo tee /etc/apt/sources.list.d/corretto.list",
-      "sudo apt-get update; sudo apt-get install -y java-1.8.0-amazon-corretto-jdk -y",
-    ]
-    connection {
-      type        = "ssh"
-      user        = "gce"
-      private_key = file("/home/logicfocus/.ssh/id_rsa")
-      host        = self.network_interface[0].access_config[0].nat_ip
-    }
-  }
-
-  provisioner "file" {
-    source      = "/home/logicfocus/jai/cicdtest/build/libs/gradleSampleArt.jar"
-    destination = "/tmp/gradleSampleArt.jar"
-    connection {
-      type        = "ssh"
-      user        = "gce"
-      private_key = file("/home/logicfocus/.ssh/id_rsa")
-      host        = self.network_interface[0].access_config[0].nat_ip
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "ls /tmp/ && java -version"
-    ]
-    connection {
-      type        = "ssh"
-      user        = "gce"
-      private_key = file("/home/logicfocus/.ssh/id_rsa")
-      host        = self.network_interface[0].access_config[0].nat_ip
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "ls /tmp/ && java -version && nohup java -jar /tmp/gradleSampleArt.jar > /tmp/result.log &"
-    ]
-    connection {
-      type        = "ssh"
-      user        = "gce"
-      private_key = file("/home/logicfocus/.ssh/id_rsa")
-      host        = self.network_interface[0].access_config[0].nat_ip
-    }
-  }
-  
-}
-output "ip" {
-  value = "${google_compute_instance.vm_instance.network_interface.0.access_config.0.nat_ip}"
-}''',
-        'Path': '/home/logicfocus/terraform/main.tf',
-      ]
-      resourceName = 'LFServer75'
-      subpluginKey = 'EC-FileOps'
-      subprocedure = 'AddTextToFile'
-      taskType = 'PLUGIN'
     }
 
     task 'Init working Dir', {
       actualParameter = [
         'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
-        'tfCommandArguments': '''-var \'project_id=lftest-407308\'
--var \'gcp-creds=/home/logicfocus/terraform/gcpcred.json\'''',
+        'tfCommandArguments': '',
       ]
       resourceName = 'LFServer75'
       subpluginKey = 'EC-Terraform'
@@ -655,8 +553,7 @@ output "ip" {
     task 'Plan', {
       actualParameter = [
         'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
-        'tfCommandArguments': '''-var \'project_id=lftest-407308\'
--var \'gcp-creds=/home/logicfocus/terraform/gcpcred.json\'''',
+        'tfCommandArguments': '',
         'tfPlanName': 'plan',
       ]
       resourceName = 'LFServer75'
@@ -678,50 +575,14 @@ output "ip" {
       taskType = 'PLUGIN'
     }
 
-    task 'Provisinor', {
+    task 'Deploy', {
       actualParameter = [
-        'config': '/projects/jai/pluginConfigurations/TerraForm75Server',
-        'tfConfigContent': '''
-    variables {
-        zone = "us-east1-b",
-        project = "$[/myPipeline/GCPProjectId]",
-        source_image = "debian-11-bullseye-v20231115",
-        ssh_username = "root",
-        credentials_path = "/home/logicfocus/terraform/gcpcred.json"
-    },
-    builders [
-        {
-            type = "googlecompute",
-            account_file = "{{user `credentials_path`}}",
-            project_id = "{{user `project`}}",
-            source_image "{{user `source_image`}}",
-            ssh_username "{{user `ssh_username`}}",
-            zone = "{{user `zone`}}",
-            image_name = "debian-11-bullseye-v20231115"
-          }
-    ],
-    provisioners [
-        {
-            type = "file",
-            source = "/home/logicfocus/jai/cicdtest/build/libs/gradleSampleArt.jar",
-            destination = "/tmp"
-        },
-        {
-            type = "shell",
-            script = "/tmp",
-            execute_command = "nohup java -jar /tmp/gradleSampleArt.jar > /tmp/gradleSampleArtOut.log &"
-        }
-    ]
-''',
-        'tfConfigFileLocationType': 'new',
-        'tfConfigLocation': '',
-        'tfOutputProperty': '/myJob/showResults',
+        'commandToRun': '/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud compute ssh logicfocus_devops@lf-instancetest --command="nohup java -jar /tmp/gradleSampleArt.jar  > /tmp/output.log 2>&1 &" --zone us-east1-b',
       ]
-      enabled = '0'
       resourceName = 'LFServer75'
-      subpluginKey = 'EC-Terraform'
-      subprocedure = 'Provision'
-      taskType = 'PLUGIN'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
     }
   }
 
@@ -730,7 +591,7 @@ output "ip" {
   property 'ec_counters', {
 
     // Custom properties
-    pipelineCounter = '372'
+    pipelineCounter = '473'
   }
 
   property 'ec_customEditorData', {
@@ -752,6 +613,16 @@ output "ip" {
       }
 
       property 'deployInGCP', {
+
+        // Custom properties
+
+        property 'checkedValue', value: 'true'
+        formType = 'standard'
+
+        property 'uncheckedValue', value: 'false'
+      }
+
+      property 'deployViaTerraform', {
 
         // Custom properties
 
