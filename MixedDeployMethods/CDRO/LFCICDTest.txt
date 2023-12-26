@@ -39,10 +39,18 @@ pipeline 'LFCICDTest', {
     uncheckedValue = 'false'
   }
 
-  formalParameter 'k0sENV', defaultValue: 'false', {
+  formalParameter 'GKEENV', defaultValue: 'false', {
     checkedValue = 'true'
-    label = 'K0S with Database '
+    label = 'GKE ENV with Database '
     orderIndex = '6'
+    type = 'checkbox'
+    uncheckedValue = 'false'
+  }
+
+  formalParameter 'GKE', defaultValue: 'false', {
+    checkedValue = 'true'
+    label = 'GKE'
+    orderIndex = '7'
     type = 'checkbox'
     uncheckedValue = 'false'
   }
@@ -138,7 +146,20 @@ $ec->setProperty("/myPipelineRuntime/buildData", $file_contents);''',
       ciConfigurationName = 'jenkins75'
       ciJobFolder = 'Jai/'
       ciJobName = 'CICDTestKubernetes'
-      condition = '$[/javascript myPipelineRuntime.kubernetesDeployment] || $[/javascript myPipelineRuntime.k0sENV]'
+      condition = '$[/javascript myPipelineRuntime.kubernetesDeployment]'
+      enabled = '0'
+      subproject = 'jai'
+      taskType = 'CI_JOB'
+    }
+
+    task 'GKE pipeline', {
+      actualParameter = [
+        'releaseVersion': '$[releaseVersion]',
+      ]
+      ciConfigurationName = 'jenkins75'
+      ciJobFolder = 'Jai/'
+      ciJobName = 'GKE'
+      condition = '$[/javascript $[/javascript myPipelineRuntime.GKEENV]'
       subproject = 'jai'
       taskType = 'CI_JOB'
     }
@@ -597,9 +618,9 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
     }
   }
 
-  stage 'K0S with Database', {
+  stage 'App with Database in GKE', {
     colorCode = '#2ca02c'
-    condition = '$[/javascript myPipelineRuntime.k0sENV]'
+    condition = '$[/javascript myPipelineRuntime.GKEENV]'
     pipelineName = 'LFCICDTest'
     resourceName = ''
 
@@ -614,10 +635,10 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
         'artifacts': '*.yaml',
         'build_number': '',
         'config_name': '/projects/jai/pluginConfigurations/JenkinsCICDTestService',
-        'job_name': 'CICDTestKubernetes',
+        'job_name': 'GKE',
         'target_directory': '',
       ]
-      resourceName = 'cheetah'
+      resourceName = 'LFServer75'
       subpluginKey = 'EC-Jenkins'
       subprocedure = 'DownloadArtifacts'
       taskType = 'PLUGIN'
@@ -625,53 +646,38 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
 
     task 'mysql-Config', {
       actualParameter = [
-        'additionalOptionsForKubectl': '',
-        'additionalOptionsForKubectlCommand': '',
-        'config': '/projects/jai/pluginConfigurations/kos-config',
-        'fileContent': '',
-        'filePath': ' /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]/mysql-configMap.yaml',
-        'resultPropertyPath': '/myJob',
-        'specSource': 'filePath',
-        'updateAction': 'apply',
+        'commandToRun': '''/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials cicdtest-cluster --zone us-east1-b --project lftest-407308
+cd /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]
+/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f mysql-configMap.yaml''',
       ]
-      resourceName = 'cheetah'
-      subpluginKey = 'EC-Kubectl'
-      subprocedure = 'Create Or Update Objects'
-      taskType = 'PLUGIN'
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
     }
 
     task 'mysql-Secrects', {
       actualParameter = [
-        'additionalOptionsForKubectl': '',
-        'additionalOptionsForKubectlCommand': '',
-        'config': '/projects/jai/pluginConfigurations/kos-config',
-        'fileContent': '',
-        'filePath': ' /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]/mysql-secrets.yaml',
-        'resultPropertyPath': '/myJob',
-        'specSource': 'filePath',
-        'updateAction': 'apply',
+        'commandToRun': '''/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials cicdtest-cluster --zone us-east1-b --project lftest-407308
+cd /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]
+/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f mysql-secrets.yaml''',
       ]
-      resourceName = 'cheetah'
-      subpluginKey = 'EC-Kubectl'
-      subprocedure = 'Create Or Update Objects'
-      taskType = 'PLUGIN'
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
     }
 
     task 'DB Deployment', {
       actualParameter = [
-        'additionalOptionsForKubectl': '',
-        'additionalOptionsForKubectlCommand': '',
-        'config': '/projects/jai/pluginConfigurations/kos-config',
-        'fileContent': '',
-        'filePath': ' /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]/db-deployment.yaml',
-        'resultPropertyPath': '/myJob',
-        'specSource': 'filePath',
-        'updateAction': 'apply',
+        'commandToRun': '''/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials cicdtest-cluster --zone us-east1-b --project lftest-407308
+cd /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]
+/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f db-deployment.yaml''',
       ]
-      resourceName = 'cheetah'
-      subpluginKey = 'EC-Kubectl'
-      subprocedure = 'Create Or Update Objects'
-      taskType = 'PLUGIN'
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
     }
 
     task 'waiting for approval', {
@@ -687,19 +693,14 @@ def result = ef.setProperty(propertyName: \'/myPipelineStageRuntime/ec_summary/Q
 
     task 'App Deployment', {
       actualParameter = [
-        'additionalOptionsForKubectl': '',
-        'additionalOptionsForKubectlCommand': '',
-        'config': '/projects/jai/pluginConfigurations/kos-config',
-        'fileContent': '',
-        'filePath': '/opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]/app-Deployment.yaml',
-        'resultPropertyPath': '/myJob',
-        'specSource': 'filePath',
-        'updateAction': 'apply',
+        'commandToRun': '''/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials cicdtest-cluster --zone us-east1-b --project lftest-407308
+cd /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Service File/job/name]
+/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f app-Deployment.yaml''',
       ]
-      resourceName = 'cheetah'
-      subpluginKey = 'EC-Kubectl'
-      subprocedure = 'Create Or Update Objects'
-      taskType = 'PLUGIN'
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
     }
 
     task 'Remove deployment', {
@@ -716,27 +717,11 @@ kubectl delete service mysql cicdtest-service''',
       subprocedure = 'RunCommand'
       taskType = 'COMMAND'
     }
-
-    task 'CMD', {
-      actualParameter = [
-        'commandToRun': '''kubectl get deployments
-echo "================"
-kubectl get pods
-echo "================"
-kubectl get service
-echo "================"
-kubectl get nodes -o wide''',
-      ]
-      enabled = '0'
-      resourceName = 'cheetah'
-      subpluginKey = 'EC-Core'
-      subprocedure = 'RunCommand'
-      taskType = 'COMMAND'
-    }
   }
 
   stage 'GKE', {
     colorCode = '#9467bd'
+    condition = '$[/javascript myPipelineRuntime.GKE]'
     pipelineName = 'LFCICDTest'
     gate 'PRE', {
       }
@@ -748,7 +733,7 @@ kubectl get nodes -o wide''',
       actualParameter = [
         'commandToRun': '''cd /home/logicfocus/jai/cicdtest
 ls
-echo "lf@2022" | sudo -S docker build -t cicdtest:1.0 .''',
+echo "lf@2022" | sudo -S docker build -t cicdtest:2.0 .''',
       ]
       resourceName = 'LFServer75'
       subpluginKey = 'EC-Core'
@@ -758,13 +743,13 @@ echo "lf@2022" | sudo -S docker build -t cicdtest:1.0 .''',
 
     task 'Push docker image to GCR', {
       actualParameter = [
-        'commandToRun': '''docker tag cicdtest:1.0 us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0
+        'commandToRun': '''docker tag cicdtest:2.0 us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:2.0
 
 /home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud artifacts repositories describe cicdtest --project=lftest-407308 --location=us-east1
 
 /home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud auth print-access-token --impersonate-service-account 902295206386-compute@developer.gserviceaccount.com | docker login -u oauth2accesstoken --password-stdin https://us-east1-docker.pkg.dev
 
-docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
+docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:2.0''',
       ]
       resourceName = 'LFServer75'
       subpluginKey = 'EC-Core'
@@ -776,6 +761,7 @@ docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
       actualParameter = [
         'commandToRun': '/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud services enable compute.googleapis.com container.googleapis.com',
       ]
+      enabled = '0'
       resourceName = 'LFServer75'
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
@@ -796,9 +782,11 @@ docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
     task 'Deploy app', {
       actualParameter = [
         'commandToRun': '''/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials cicdtest-cluster --zone us-east1-b --project lftest-407308
-/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl create deployment cicdtest --image=us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
+/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl create deployment cicdtest --image=us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0
+#cd /home/logicfocus/jai/cicdtest
+#/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f db-deployment.yaml
+#/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f app-Deployment.yaml''',
       ]
-      enabled = '0'
       resourceName = 'LFServer75'
       subpluginKey = 'EC-Core'
       subprocedure = 'RunCommand'
@@ -822,7 +810,7 @@ docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
   property 'ec_counters', {
 
     // Custom properties
-    pipelineCounter = '547'
+    pipelineCounter = '559'
   }
 
   property 'ec_customEditorData', {
@@ -832,6 +820,26 @@ docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
     property 'parameters', {
 
       // Custom properties
+
+      property 'GKE', {
+
+        // Custom properties
+
+        property 'checkedValue', value: 'true'
+        formType = 'standard'
+
+        property 'uncheckedValue', value: 'false'
+      }
+
+      property 'GKEENV', {
+
+        // Custom properties
+
+        property 'checkedValue', value: 'true'
+        formType = 'standard'
+
+        property 'uncheckedValue', value: 'false'
+      }
 
       property 'componentDeployment', {
 
@@ -854,16 +862,6 @@ docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0''',
       }
 
       property 'deployViaTerraform', {
-
-        // Custom properties
-
-        property 'checkedValue', value: 'true'
-        formType = 'standard'
-
-        property 'uncheckedValue', value: 'false'
-      }
-
-      property 'k0sENV', {
 
         // Custom properties
 
