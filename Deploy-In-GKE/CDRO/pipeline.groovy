@@ -133,6 +133,88 @@ cd /opt/cloudbees/sda/workspace/$[/myStageRuntime/tasks/Get Deployment and Servi
     }
   }
 
+  stage 'Deploy app using CLI in GKE', {
+    colorCode = '#2ca02c'
+    pipelineName = 'Deploy-In-GKE'
+    gate 'PRE', {
+      }
+
+    gate 'POST', {
+      }
+
+    task 'Build docker image', {
+      actualParameter = [
+        'commandToRun': '''cd /home/logicfocus/jai/cicdtest
+ls
+echo "lf@2022" | sudo -S docker build -t cicdtest:2.0 .''',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+
+    task 'Push docker image to GCR', {
+      actualParameter = [
+        'commandToRun': '''docker tag cicdtest:2.0 us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:2.0
+
+/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud artifacts repositories describe cicdtest --project=lftest-407308 --location=us-east1
+
+/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud auth print-access-token --impersonate-service-account 902295206386-compute@developer.gserviceaccount.com | docker login -u oauth2accesstoken --password-stdin https://us-east1-docker.pkg.dev
+
+docker push us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:2.0''',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+
+    task 'Enable services', {
+      actualParameter = [
+        'commandToRun': '/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud services enable compute.googleapis.com container.googleapis.com',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+
+    task 'Create cluster', {
+      actualParameter = [
+        'commandToRun': '/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters create cicdtest-cluster  --num-nodes 2  --machine-type n1-standard-1  --zone us-east1-b',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+
+    task 'Deploy app', {
+      actualParameter = [
+        'commandToRun': '''/home/logicfocus/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials cicdtest-cluster --zone us-east1-b --project lftest-407308
+/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl create deployment cicdtest --image=us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0
+#cd /home/logicfocus/jai/cicdtest
+#/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f db-deployment.yaml
+#/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl apply -f app-Deployment.yaml''',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+
+    task 'Expose app', {
+      actualParameter = [
+        'commandToRun': '/home/logicfocus/gcloud/google-cloud-sdk/bin/kubectl create service loadbalancer cicdtest --tcp=8080:8080',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+  }
+
   // Custom properties
 
   property 'ec_counters', {
