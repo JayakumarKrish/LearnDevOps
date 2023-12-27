@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment # Kubernetes resource kind we are creating
+metadata:
+  name: cicdtest
+spec:
+  selector:
+    matchLabels:
+      app: cicdtest
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: cicdtest
+    spec:
+      containers:
+        - name: cicdtest
+          image: jayakumarkrishnan/cicdtest:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
