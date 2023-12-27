@@ -1,0 +1,92 @@
+pipeline {
+    agent any
+    environment {
+        REPO_RELEASE_VERSION = '*/${releaseVersion}'
+        SONAR_PRO_KEY = 'CICDTestService'
+        SONAR_PRO_VERSION = '1.0'
+        NEXUS_REPO_GROUPID = 'com.logicfocus'
+        NEXUS_REPO_ARTIFACT = 'cicdtestservice'
+        NEXUS_REPO = 'CICDTestService'
+        CHECKSUM =''
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: "$REPO_RELEASE_VERSION"]], extensions: [], userRemoteConfigs: [[credentialsId: 'jaiGitlabSecrect', url: 'https://gitlab.com/jayakumar97/cicdtest.git']])
+            }
+        }
+        stage('Build') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                sh 'chmod -R 755 .'
+                sh './gradlew clean -Pversion=${releaseVersion} build'
+            }
+        }
+        stage ('Scan') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                withSonarQubeEnv(installationName: 'Sonar_12', credentialsId: 'sonar') {
+                sh "./gradlew sonarqube \
+                  -Dsonar.projectKey=$SONAR_PRO_KEY \
+                  -Dsonar.projectName=$SONAR_PRO_KEY \
+                  -Dsonar.projectVersion=$SONAR_PRO_VERSION"
+                }
+             }
+        }
+        stage ('OSS'){
+            steps {
+                sh './gradlew clean cyclonedxBom'
+                withCredentials([string(credentialsId: 'deptrack-api', variable: 'DEPENDENCY_TRACKER_API_KEY')]) {
+                     dependencyTrackPublisher artifact: 'build/reports/bom.json', projectName: 'CICDTestService', projectVersion: '1.0', synchronous: true, dependencyTrackApiKey: "$DEPENDENCY_TRACKER_API_KEY", projectProperties: [tags: [], group: "$NEXUS_REPO_GROUPID"]
+                }
+            }
+        }
+        
+        stage ('Package') {
+            steps {
+                sh './gradlew clean buildZip'
+            }
+        }
+        stage ('Publish') {
+            steps {
+                nexusArtifactUploader(
+                    nexusVersion: "${nexusVersion}",
+                    protocol: 'http',
+                    nexusUrl: "${nexusURL}",
+                    groupId: "$NEXUS_REPO_GROUPID",
+                    version: "${releaseVersion}",
+                    repository: "$NEXUS_REPO",
+                    credentialsId: 'nexus1',
+                    artifacts: [
+                        [artifactId: "$NEXUS_REPO_ARTIFACT",
+                         classifier: '',
+                         file: 'build/distributions/gradleSampleArt.zip',
+                         type: 'zip']
+                    ]
+                )
+            }
+        }
+        stage ('Artifact Generation') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'nexus1', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        def artifactDetails = sh(script: "curl -u $USER:$PASS -X GET '${NEXUS_URL}/service/rest/v1/components?repository=$NEXUS_REPO&group=$NEXUS_REPO_GROUPID&name=$NEXUS_REPO_ARTIFACT&version=${releaseVersion}'", returnStdout: true)
+                        CHECKSUM = readJSON(text: "$artifactDetails").items[0].assets[0].checksum.sha1
+                        writeFile file: 'Build.txt', text: """{ \"checksum\":\"$CHECKSUM\", \"version\":\"${releaseVersion}\", \"groupId\":\"$NEXUS_REPO_GROUPID\", \"artifactId\":\"$NEXUS_REPO_ARTIFACT\" }"""
+                    }
+                }
+            }
+        }
+    }
+    post { 
+        success { 
+            echo '=======archiveArtifacts======'
+            archiveArtifacts artifacts: 'Build.txt', onlyIfSuccessful: true
+        }
+    }
+   
+}
