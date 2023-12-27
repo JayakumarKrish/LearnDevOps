@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment # Kubernetes resource kind we are creating
+metadata:
+  name: cicdtest
+spec:
+  selector:
+    matchLabels:
+      app: cicdtest
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: cicdtest
+    spec:
+      containers:
+        - name: cicdtest
+          image: us-east1-docker.pkg.dev/lftest-407308/cicdtest/cicdtest:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env: # Setting Enviornmental Variables
+            - name: DB_HOST   # Setting Database host address from configMap
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: host
+
+            - name: DB_NAME  # Setting Database name from configMap
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: dbName
+
+            - name: DB_USERNAME  # Setting Database username from Secret
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: username
+
+            - name: DB_PASSWORD # Setting Database password from Secret
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: cicdtest-service
+spec:
+  selector:
+    app: cicdtest
+  ports:
+    - protocol: "TCP"
+      port: 9092 # The port that the service is running on in the cluster
+      targetPort: 9092 # The port exposed by the service
+  type: LoadBalancer # type of the service.
