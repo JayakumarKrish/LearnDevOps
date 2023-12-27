@@ -16,4 +16,11 @@ This pipeline deploys the springboot application in **Google Kubernates Engine**
        - Service Account Token Creator
        - Storage Admin
        - Storage Object Admin
+
+**Stage: Deploy app using CLI in GKE**
+
+  - This stage will build docker image in local machine and push them into Google Artifact Registry.
+  - Creat kubernates cluster
+  - Enable following services compute.googleapis.com, container.googleapis.com
+  - Deploy gcr image. (us-east1-docker.pkg.dev) 
    
