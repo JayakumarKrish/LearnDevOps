@@ -49,7 +49,7 @@ fi''',
     }
   }
 
-  stage 'Deploy via Terraform', {
+  stage 'Deploy via Terraform in GCP', {
     colorCode = '#ff7f0e'
     pipelineName = 'Deploy-Using-Terraform'
     gate 'PRE', {
@@ -136,12 +136,109 @@ fi''',
     }
   }
 
+  stage 'Deploy via Terraform in AWS', {
+    colorCode = '#ff7f0e'
+    pipelineName = 'Deploy-Using-Terraform'
+    gate 'PRE', {
+      }
+
+    gate 'POST', {
+      }
+
+    task ' Retrieve artifact', {
+      actualParameter = [
+        'artifactId': 'cicdtestservice',
+        'classifier': '',
+        'config': '/projects/Logicfocus/pluginConfigurations/Nexus-config',
+        'destination': '/home/logicfocus/terraform/cicdInAWS',
+        'extension': 'zip',
+        'groupId': 'com.logicfocus',
+        'latestVersion': '0',
+        'overwrite': '1',
+        'repository': 'CICDTestService',
+        'repoType': 'maven',
+        'resultPropertySheet': '',
+        'version': '$[releaseVersion]',
+      ]
+      enabled = '0'
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Nexus'
+      subprocedure = 'Retrieve Artifact from Nexus'
+      taskType = 'PLUGIN'
+    }
+
+    task 'Extract', {
+      actualParameter = [
+        'commandToRun': 'unzip /home/logicfocus/terraform/cicdInAWS/cicdtestservice-$[releaseVersion].zip -d /home/logicfocus/terraform/cicdTestApp',
+      ]
+      enabled = '0'
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+
+    task 'Init working Dir', {
+      actualParameter = [
+        'config': '/projects/jai/pluginConfigurations/terraform75AWS',
+        'tfCommandArguments': '''-var \'ami=ami-0c7217cdde317cfec\'
+-var \'instanceType=t2.micro\'
+-var \'keyName=jai-test-key\'
+-var \'accessKey=AKIATV4FDTBJHSRN6U5Y\'
+-var \'secrectKey=nLjLPQTbOGkEPkr3z/Cvca7aVvtebfLMAig3nX+U\'''',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Terraform'
+      subprocedure = 'Init'
+      taskType = 'PLUGIN'
+    }
+
+    task 'Plan', {
+      actualParameter = [
+        'config': '/projects/jai/pluginConfigurations/terraform75AWS',
+        'tfCommandArguments': '''-var \'ami=ami-0c7217cdde317cfec\'
+-var \'instanceType=t2.micro\'
+-var \'keyName=jai-test-key\'
+-var \'accessKey=AKIATV4FDTBJHSRN6U5Y\'
+-var \'secrectKey=nLjLPQTbOGkEPkr3z/Cvca7aVvtebfLMAig3nX+U\'''',
+        'tfPlanName': 'plan',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Terraform'
+      subprocedure = 'Plan'
+      taskType = 'PLUGIN'
+    }
+
+    task 'Create EC2 instance', {
+      actualParameter = [
+        'config': '/projects/jai/pluginConfigurations/terraform75AWS',
+        'tfCommandArguments': '',
+        'tfOutputProperty': '/myJob/showResults',
+        'tfPlanName': 'plan',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Terraform'
+      subprocedure = 'Apply'
+      taskType = 'PLUGIN'
+    }
+
+    task 'Deploy', {
+      actualParameter = [
+        'commandToRun': 'aws ssm send-command --region us-east-1 --document-name AWS-RunShellScript  --parameters \'commands=["nohup java -jar /tmp/gradleSampleArt.jar  > /tmp/output.log 2>&1 &"]\' --targets Key=tag:Name,Values=lf-test-instance',
+      ]
+      resourceName = 'LFServer75'
+      subpluginKey = 'EC-Core'
+      subprocedure = 'RunCommand'
+      taskType = 'COMMAND'
+    }
+  }
+
   // Custom properties
 
   property 'ec_counters', {
 
     // Custom properties
-    pipelineCounter = '562'
+    pipelineCounter = '585'
   }
 
   property 'ec_customEditorData', {
