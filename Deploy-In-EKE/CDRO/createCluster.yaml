@@ -1,0 +1,54 @@
+kind: ClusterConfig
+
+metadata:
+  name: lf-test
+  region: us-east-1
+  version: "1.28"
+#vpc:
+#  id: vpc-068c94c9856801a3c
+#  subnets:
+#    Public:
+#      us-east-1c:
+#          id: subnet-02b3ca29c3bf0f3d5
+#      us-east-1b:
+#          id: subnet-0b6ff29ff30cdf36b
+managedNodeGroups:
+  - name: cluster-node-1
+    ssh:
+      allow: true
+      publicKeyName: jai-test-key  
+#    securityGroups: 
+#      attachIDs: ["sg-0543f6153e6159486"]
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 5
+    volumeSize: 80
+  - name: cluster-node-2
+    ssh:
+      allow: true
+      publicKeyName: jai-test-key
+#    securityGroups: 
+#      attachIDs: ["sg-0543f6153e6159486"]
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+    instanceType: t3.medium
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 5
+#    iam:
+#      attachPolicyARNs:
+#        - arn:aws:iam::253145356370:role/lf-test-role
+    volumeSize: 80
