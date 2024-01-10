@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+    environment {
+        REPO_RELEASE_VERSION = '*/${releaseVersion}'
+        SONAR_PRO_KEY = 'CICDTestService'
+        SONAR_PRO_VERSION = '1.0'
+        CHECKSUM =''
+        AWS_ACCOUNT_ID = "253145356370"
+        AWS_REGION = "us-east-1" 
+        REPOSITORY_URI = "253145356370.dkr.ecr.us-east-1.amazonaws.com/lf-test-registry"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: "$REPO_RELEASE_VERSION"]], extensions: [], userRemoteConfigs: [[credentialsId: 'jaiGitlabSecrect', url: 'https://gitlab.com/jayakumar97/cicdtest.git']])
+            }
+        }
+        stage('Build') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                sh 'chmod -R 755 .'
+                sh './gradlew clean -Pversion=${releaseVersion} build'
+            }
+        }
+        stage ('Scan') {
+            tools {
+                jdk 'java-8'
+            }
+            steps {
+                withSonarQubeEnv(installationName: 'Sonar_12', credentialsId: 'sonar') {
+                sh "./gradlew sonarqube \
+                  -Dsonar.projectKey=$SONAR_PRO_KEY \
+                  -Dsonar.projectName=$SONAR_PRO_KEY \
+                  -Dsonar.projectVersion=$SONAR_PRO_VERSION"
+                }
+             }
+        }
+        stage('Docker Build') {
+            steps { 
+                    echo 'Building docker Image'
+                    sh "docker build --build-arg RELEASE_VERSION=${releaseVersion} -t cicdtest:${releaseVersion} ."
+                }
+        }
+        stage('Logging into AWS ECR') {
+             steps {
+                 script {
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                }
+             
+            }
+        }
+        stage('Pushing to ECR') {
+            steps{ 
+                script {
+                    sh "docker tag cicdtest:${releaseVersion} ${REPOSITORY_URI}:${releaseVersion}"
+                    sh "docker push ${REPOSITORY_URI}:${releaseVersion}"
+                }
+            }
+        }
+    }
+    post {
+        success {
+            sh 'docker logout'
+            archiveArtifacts artifacts: 'k0s-deployment.yaml', onlyIfSuccessful: true
+            archiveArtifacts artifacts: 'k0s-service.yaml', onlyIfSuccessful: true
+        }
+    }
+}
